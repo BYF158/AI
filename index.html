@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEBULA·星云图库</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="grid-bg"></div>
+
+<header class="glitch-wrap">
+  <h1 class="glitch" data-text="NEBULA ▸ 星云图库">NEBULA ▸ 星云图库</h1>
+  <p class="sub">CLOUD IMAGERY STORAGE · v3.0.0</p>
+</header>
+
+<main>
+  <section id="drop-zone" class="drop-zone">
+    <div class="dz-inner">
+      <div class="dz-icon">⬆</div>
+      <p class="dz-main">拖拽图片到此处 / 点击选择</p>
+      <p class="dz-sub">上传至云端 · PNG / JPG / GIF / WebP</p>
+      <input type="file" id="file-input" accept="image/*" multiple hidden>
+    </div>
+    <p id="upload-status" class="upload-status"></p>
+  </section>
+
+  <section class="gallery-header">
+    <h2>▸ 云端影像 <span id="count">0</span></h2>
+    <button id="clear-all" class="danger-btn">清空全部</button>
+  </section>
+
+  <section id="gallery" class="gallery"></section>
+</main>
+
+<footer>
+  <p>NEBULA STORAGE · 图片存储于 Cloudinary 云端 · 所有人可见</p>
+</footer>
+
+<div id="lightbox" class="lightbox" hidden>
+  <img id="lightbox-img" alt="">
+  <button id="lightbox-close" class="lb-close">×</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
