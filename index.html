@@ -13,15 +13,19 @@
 
 <header class="hero">
   <h1 class="glitch" data-text="NEBULA ▸ 星云画廊">NEBULA ▸ 星云画廊</h1>
-  <p class="sub">CLOUD IMAGERY GALLERY · v4.0.0</p>
-  <p class="hint">↓ 滚动浏览 · 悬停卡片有惊喜 ↓</p>
+  <p class="sub">AUTO SCROLL GALLERY · v5.0.0</p>
+  <p class="hint">◈ 图片自动巡游 · 悬停可暂停 ◈</p>
 </header>
 
 <main>
-  <!-- 图片展示区：瀑布流 3D 卡片 -->
-  <section id="gallery" class="gallery">
-    <div class="empty">◈ 画廊空空如也，点击右下角按钮上传第一张图 ◈</div>
-  </section>
+  <!-- 自动横向滚动走廊 -->
+  <div class="carousel-wrap">
+    <div class="carousel-track" id="track">
+      <!-- 卡片由 JS 注入 -->
+    </div>
+    <div class="carousel-edge left"></div>
+    <div class="carousel-edge right"></div>
+  </div>
 </main>
 
 <!-- 右下角悬浮添加按钮 -->

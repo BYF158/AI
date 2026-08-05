@@ -101,73 +101,100 @@ header, main, footer { position: relative; z-index: 2; }
   50% { opacity: 1; transform: translateY(4px); }
 }
 
-/* ===== 画廊：瀑布流 ===== */
+/* ===== 自动横向滚动走廊 ===== */
 main {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 1.2rem 1.5rem 7rem;
+  padding: 0.6rem 0 7rem;
+  overflow: hidden;
 }
-.gallery {
-  column-count: 4;
-  column-gap: 1.4rem;
+
+.carousel-wrap {
+  position: relative;
+  perspective: 1400px;
+  padding: 2rem 0 1rem;
 }
-@media (max-width: 1100px) { .gallery { column-count: 3; } }
-@media (max-width: 760px)  { .gallery { column-count: 2; } }
-@media (max-width: 480px)  { .gallery { column-count: 1; } }
+
+/* 滚动轨道 */
+.carousel-track {
+  display: flex;
+  gap: 1.4rem;
+  padding: 1rem 3rem;
+  width: max-content;
+  will-change: transform;
+}
+/* 自动滚动动画 */
+.carousel-wrap.playing .carousel-track {
+  animation: scrollX var(--speed, 40s) linear infinite;
+}
+@keyframes scrollX {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+/* 悬停轨道暂停滚动 */
+.carousel-wrap:hover .carousel-track,
+.carousel-wrap.paused .carousel-track {
+  animation-play-state: paused;
+}
+
+/* 两侧渐隐遮罩 */
+.carousel-edge {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 10rem;
+  pointer-events: none;
+  z-index: 4;
+}
+.carousel-edge.left  { left: 0;  background: linear-gradient(90deg, var(--bg-deep) 5%, transparent); }
+.carousel-edge.right { right: 0; background: linear-gradient(-90deg, var(--bg-deep) 5%, transparent); }
 
 .empty {
-  grid-column: 1 / -1;
   text-align: center;
   color: var(--text-dim);
-  padding: 4rem 0;
+  padding: 4rem 3rem;
   letter-spacing: 2px;
   border: 1px dashed var(--border-glow);
   border-radius: 12px;
-  break-inside: avoid;
-  margin: 0 auto;
+  margin: 2rem auto;
   max-width: 90%;
 }
 
-/* ===== 3D 卡片 ===== */
+/* ===== 3D 滚动卡片 ===== */
 .card {
   position: relative;
-  margin-bottom: 1.4rem;
-  break-inside: avoid;
-  border-radius: 14px;
+  flex: 0 0 auto;
+  width: 300px;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--border-glow);
   background: var(--bg-panel);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
   transform-style: preserve-3d;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, filter 0.25s;
   cursor: zoom-in;
-  animation: rise 0.5s ease both;
 }
-.card:hover {
-  border-color: var(--neon-cyan);
-  box-shadow:
-    0 20px 45px rgba(0, 0, 0, 0.6),
-    0 0 30px rgba(0, 240, 255, 0.45),
-    inset 0 0 25px rgba(0, 240, 255, 0.08);
-}
-@keyframes rise {
-  from { opacity: 0; transform: translateY(30px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-/* 悬停时由 JS 添加 tilt 类 */
-.card.tilting { transition: transform 0.08s ease-out; }
-
 .card img {
   width: 100%;
-  display: block;
+  height: 380px;
   object-fit: cover;
+  display: block;
   pointer-events: none;
 }
+/* 悬停单张卡片：放大 + 立体 */
+.card:hover {
+  border-color: var(--neon-cyan);
+  filter: brightness(1.1);
+  box-shadow:
+    0 25px 55px rgba(0, 0, 0, 0.65),
+    0 0 35px rgba(0, 240, 255, 0.55),
+    inset 0 0 25px rgba(0, 240, 255, 0.1);
+}
+.card.tilting { transition: transform 0.08s ease-out; }
 .card .shine {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.18), transparent 60%);
+  background: radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.2), transparent 60%);
   opacity: 0;
   transition: opacity 0.3s;
   z-index: 2;
@@ -183,9 +210,8 @@ main {
   align-items: center;
   font-size: 0.72rem;
   color: var(--text-dim);
-  background: linear-gradient(transparent, rgba(2, 8, 14, 0.85));
+  background: linear-gradient(transparent, rgba(2, 8, 14, 0.9));
   z-index: 3;
-  transform: translateZ(25px);
 }
 .card .del {
   background: transparent;
