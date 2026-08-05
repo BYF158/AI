@@ -1,20 +1,19 @@
-// NEBULA 星云图库 — 云端存储版 (Cloudinary unsigned upload)
-// 图片上传至 Cloudinary 云服务器，所有人可见。
+// NEBULA 星云画廊 — 云端存储版 (Cloudinary unsigned upload)
+// 炫酷 3D 卡片画廊 + 底部悬浮上传按钮 + 弹窗上传
 (() => {
   // ===== 配置区（按需修改）=====
   const CLOUD_NAME = 'xdg5jjqx';       // 你的 Cloudinary Cloud Name
   const UPLOAD_PRESET = 'github-web';  // 你的 unsigned upload preset
   // ================================
 
-  // 图库清单的存储 key（存图片 URL 列表）。纯静态站点只能存在浏览器本地，
-  // 因此"所有人可见"指的是图片本身在云端，清单仍保存在各访客浏览器。
   const MANIFEST_KEY = 'nebula-manifest';
 
+  const gallery = document.getElementById('gallery');
+  const fab = document.getElementById('fab');
+  const modal = document.getElementById('upload-modal');
+  const modalClose = document.getElementById('modal-close');
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input');
-  const gallery = document.getElementById('gallery');
-  const countEl = document.getElementById('count');
-  const clearAllBtn = document.getElementById('clear-all');
   const statusEl = document.getElementById('upload-status');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
@@ -75,23 +74,49 @@
     statusEl.className = 'upload-status' + (isError ? ' error' : '');
   }
 
+  // ---- 3D 倾斜效果 ----
+  function attachTilt(card) {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      const rx = (0.5 - py) * 12;  // 绕 X 轴
+      const ry = (px - 0.5) * 12;  // 绕 Y 轴
+      card.classList.add('tilting');
+      card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+      // 高光跟随鼠标
+      const shine = card.querySelector('.shine');
+      if (shine) {
+        shine.style.setProperty('--mx', `${px * 100}%`);
+        shine.style.setProperty('--my', `${py * 100}%`);
+      }
+    });
+    card.addEventListener('mouseleave', () => {
+      card.classList.remove('tilting');
+      card.style.transform = '';
+    });
+  }
+
   // ---- 渲染 ----
   function render() {
     const list = loadManifest();
-    countEl.textContent = list.length;
     if (list.length === 0) {
-      gallery.innerHTML = '<div class="empty">◈ 暂无云端影像，请上传 ◈</div>';
+      gallery.innerHTML = '<div class="empty">◈ 画廊空空如也，点击右下角按钮上传第一张图 ◈</div>';
       return;
     }
     gallery.innerHTML = '';
     list.forEach(img => {
       const card = document.createElement('div');
       card.className = 'card';
+
       const el = document.createElement('img');
       el.src = img.url;
       el.alt = img.name;
-      el.title = '点击放大';
-      el.addEventListener('click', () => openLightbox(img.url));
+      el.title = img.name;
+
+      const shine = document.createElement('div');
+      shine.className = 'shine';
+
       const meta = document.createElement('div');
       meta.className = 'meta';
       const info = document.createElement('span');
@@ -100,18 +125,28 @@
       del.className = 'del';
       del.textContent = '✕';
       del.title = '从列表移除';
-      del.addEventListener('click', () => {
+      del.addEventListener('click', e => {
+        e.stopPropagation();
         removeFromManifest(img.id);
         render();
       });
       meta.appendChild(info);
       meta.appendChild(del);
+
       card.appendChild(el);
+      card.appendChild(shine);
       card.appendChild(meta);
+
+      // 点击放大
+      el.addEventListener('click', () => openLightbox(img.url));
+      card.addEventListener('click', () => openLightbox(img.url));
+
+      attachTilt(card);
       gallery.appendChild(card);
     });
   }
 
+  // ---- 灯箱 ----
   function openLightbox(src) {
     lightboxImg.src = src;
     lightbox.hidden = false;
@@ -121,7 +156,23 @@
     lightboxImg.src = '';
   }
 
-  // ---- 事件 ----
+  // ---- 弹窗控制 ----
+  function openModal() {
+    modal.hidden = false;
+    setStatus('');
+  }
+  function closeModal() {
+    modal.hidden = true;
+    setStatus('');
+  }
+
+  fab.addEventListener('click', openModal);
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+
+  // ---- 上传事件 ----
   dropZone.addEventListener('click', () => fileInput.click());
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
@@ -149,24 +200,23 @@
       }
       setStatus(`✅ 上传完成，共 ${ok} 张`);
       render();
+      // 上传完成后稍等关闭弹窗
+      setTimeout(closeModal, 900);
     } catch (err) {
       console.error(err);
       setStatus(`⚠ ${err.message}`, true);
     }
   }
 
-  clearAllBtn.addEventListener('click', () => {
-    const list = loadManifest();
-    if (list.length === 0) return;
-    if (confirm('确定要清空当前浏览器中的影像列表吗？')) {
-      saveManifest([]);
-      render();
-    }
-  });
-
+  // ---- 灯箱关闭 ----
   lightboxClose.addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeLightbox();
+      if (!modal.hidden) closeModal();
+    }
+  });
 
   // ---- 启动 ----
   render();

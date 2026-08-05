@@ -3,41 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEBULA·星云图库</title>
+<title>NEBULA · 星云画廊</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="scanlines"></div>
 <div class="grid-bg"></div>
+<div class="aurora"></div>
 
-<header class="glitch-wrap">
-  <h1 class="glitch" data-text="NEBULA ▸ 星云图库">NEBULA ▸ 星云图库</h1>
-  <p class="sub">CLOUD IMAGERY STORAGE · v3.0.0</p>
+<header class="hero">
+  <h1 class="glitch" data-text="NEBULA ▸ 星云画廊">NEBULA ▸ 星云画廊</h1>
+  <p class="sub">CLOUD IMAGERY GALLERY · v4.0.0</p>
+  <p class="hint">↓ 滚动浏览 · 悬停卡片有惊喜 ↓</p>
 </header>
 
 <main>
-  <section id="drop-zone" class="drop-zone">
-    <div class="dz-inner">
-      <div class="dz-icon">⬆</div>
-      <p class="dz-main">拖拽图片到此处 / 点击选择</p>
-      <p class="dz-sub">上传至云端 · PNG / JPG / GIF / WebP</p>
-      <input type="file" id="file-input" accept="image/*" multiple hidden>
-    </div>
-    <p id="upload-status" class="upload-status"></p>
+  <!-- 图片展示区：瀑布流 3D 卡片 -->
+  <section id="gallery" class="gallery">
+    <div class="empty">◈ 画廊空空如也，点击右下角按钮上传第一张图 ◈</div>
   </section>
-
-  <section class="gallery-header">
-    <h2>▸ 云端影像 <span id="count">0</span></h2>
-    <button id="clear-all" class="danger-btn">清空全部</button>
-  </section>
-
-  <section id="gallery" class="gallery"></section>
 </main>
 
-<footer>
-  <p>NEBULA STORAGE · 图片存储于 Cloudinary 云端 · 所有人可见</p>
-</footer>
+<!-- 右下角悬浮添加按钮 -->
+<button id="fab" class="fab" title="添加图片" aria-label="添加图片">
+  <span class="fab-plus">＋</span>
+  <span class="fab-label">上传</span>
+</button>
 
+<!-- 上传弹窗 -->
+<div id="upload-modal" class="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>▸ 添加图片到云端</h2>
+      <button id="modal-close" class="modal-close" title="关闭">×</button>
+    </div>
+    <div id="drop-zone" class="drop-zone">
+      <div class="dz-inner">
+        <div class="dz-icon">⬆</div>
+        <p class="dz-main">拖拽图片到此处 / 点击选择</p>
+        <p class="dz-sub">上传至云端 · PNG / JPG / GIF / WebP</p>
+        <input type="file" id="file-input" accept="image/*" multiple hidden>
+      </div>
+      <p id="upload-status" class="upload-status"></p>
+    </div>
+  </div>
+</div>
+
+<!-- 灯箱预览 -->
 <div id="lightbox" class="lightbox" hidden>
   <img id="lightbox-img" alt="">
   <button id="lightbox-close" class="lb-close">×</button>
